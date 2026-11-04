@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101526"><meta name="description" content="Treino Dual, Triple e Quad N-Back offline">
+<title>N-Back — Treino Mental</title>
+<style>
+:root{--bg:#0d1220;--panel:#171f33;--panel2:#202b43;--line:#303d58;--txt:#f3f6ff;--muted:#9eacc6;--cyan:#62e5df;--blue:#7e9dff;--pink:#ff7ca8;--green:#70e0a2;--red:#ff7585}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#263858 0%,var(--bg) 55%);color:var(--txt);font:16px system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+header{padding:20px 18px 10px;max-width:850px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-size:23px;margin:0;letter-spacing:.2px}header small{color:var(--muted)}main{max-width:850px;margin:auto;padding:12px 16px 40px}.tabs{display:flex;gap:8px;overflow:auto;margin:8px 0 16px}.tab,button,select{font:inherit}.tab{background:var(--panel);color:var(--muted);border:1px solid var(--line);padding:10px 14px;border-radius:12px;white-space:nowrap}.tab.active{background:#263954;border-color:var(--cyan);color:white}
+.panel{background:linear-gradient(145deg,#1a2439,#141c2e);border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:14px;box-shadow:0 12px 35px #0003}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.row.between{justify-content:space-between}.muted{color:var(--muted)}.tiny{font-size:12px;color:var(--muted)}label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}select{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:11px;min-width:110px}.primary,.secondary,.danger{border:0;border-radius:12px;padding:12px 16px;font-weight:700;color:#101827}.primary{background:var(--cyan)}.secondary{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}.danger{background:#532a3a;color:#ffdce4}.primary:disabled,.secondary:disabled{opacity:.35}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#111a2b;border:1px solid var(--line);border-radius:13px;padding:11px}.stat b{display:block;font-size:21px}.stat span{font-size:11px;color:var(--muted)}
+#game{display:none}.gamehead{display:flex;justify-content:space-between;align-items:center;gap:8px}.progress{height:6px;background:#0c1424;border-radius:9px;overflow:hidden;margin:13px 0}.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .2s}
+.stage{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}.stim{background:#10192a;border:1px solid var(--line);border-radius:16px;min-height:155px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px}.stim .symbol{font-size:44px;font-weight:800;line-height:1}.stim .hint{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}.grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:116px;height:116px}.cell{border-radius:6px;background:#27344c;border:1px solid #3b4c69}.cell.on{background:var(--cyan);box-shadow:0 0 18px #62e5df88;border-color:#c7fffa}
+.matchgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:13px}.matchbtn{padding:15px 8px;min-height:55px;border:1px solid var(--line);border-radius:13px;background:#202c43;color:white;font-weight:700}.matchbtn.hit{background:#1e675e;border-color:var(--cyan);box-shadow:inset 0 0 0 2px var(--cyan)}
+.matchbtn em{display:block;font-size:11px;font-style:normal;color:#b5c3db;font-weight:400;margin-top:3px}
+#feedback{min-height:23px;text-align:center;color:var(--muted);font-size:13px;margin-top:10px}
+.hidden{display:none!important}.historyitem{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.historyitem:last-child{border:0}.pill{padding:5px 9px;background:#25334c;border-radius:20px;font-size:12px;color:var(--cyan)}.bar{height:8px;border-radius:9px;background:#0c1424;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:var(--green)}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:15px}
+@media(max-width:480px){header{padding-top:15px}.panel{padding:14px}.stage{gap:8px}.stim{min-height:140px}.grid9{width:104px;height:104px}.stats{gap:6px}.stat b{font-size:18px}.matchbtn{font-size:14px}}
+</style></head>
+<body>
+<header><div><h1>◈ N-Back</h1><small>Treino de memória de trabalho · offline</small></div><span class="pill">SEM CONTA</span></header>
+<main>
+<div class="tabs"><button class="tab active" data-tab="train">Treinar</button><button class="tab" data-tab="progress">Progresso</button><button class="tab" data-tab="settings">Dados e ajuda</button></div>
+<section id="train">
+<div class="panel" id="setup">
+<div class="row between"><div><b>Configure seu treino</b><div class="tiny">Escolha quantas modalidades lembrar ao mesmo tempo.</div></div><span class="pill">1–9 N-back</span></div>
+<div class="row" style="margin-top:16px;gap:14px">
+<div><label>Modo</label><select id="mode"><option value="2">Dual N-Back</option><option value="3">Triple N-Back</option><option value="4">Quad N-Back</option></select></div>
+<div><label>Nível N-back</label><select id="level"></select></div>
+<div><label>Rodada</label><select id="length"><option value="20">20 tentativas</option><option value="30">30 tentativas</option><option value="40">40 tentativas</option></select></div>
+</div>
+<div class="row" style="margin-top:16px"><button class="primary" id="start">Começar rodada</button><span class="tiny">Dica: comece no nível 1.</span></div>
+</div>
+<div class="panel" id="game">
+<div class="gamehead"><div><b id="gameTitle">Dual N-Back</b><div class="tiny" id="roundMeta">Nível 1 · rodada</div></div><div style="text-align:right"><b id="counter">0 / 20</b><div class="tiny">tentativa</div></div></div>
+<div class="progress"><i id="progressbar"></i></div>
+<div class="stage" id="stage"></div>
+<div class="matchgrid" id="matchgrid"></div>
+<div id="feedback">Observe os estímulos e marque quando houver correspondência.</div>
+<div class="row between" style="margin-top:12px"><button class="secondary" id="pause">Pausar</button><button class="danger" id="quit">Encerrar</button></div>
+</div>
+<div class="panel" id="result" style="display:none"></div>
+<div class="panel"><div class="row between"><b>Seu melhor nível</b><span class="pill" id="best">Ainda sem recorde</span></div><p class="tiny">O progresso é guardado apenas neste aparelho. Cada rodada tem estímulos gerados localmente.</p></div>
+</section>
+<section id="progress" class="hidden">
+<div class="panel"><b>Visão geral</b><div class="stats" style="margin-top:13px"><div class="stat"><b id="totalRounds">0</b><span>RODADAS</span></div><div class="stat"><b id="avgAcc">—</b><span>ACERTO MÉDIO</span></div><div class="stat"><b id="topLevel">—</b><span>MAIOR N-BACK</span></div></div></div>
+<div class="panel"><b>Histórico recente</b><div id="history" class="muted tiny" style="margin-top:8px">Nenhuma rodada concluída ainda.</div></div>
+</section>
+<section id="settings" class="hidden">
+<div class="panel"><b>Backup e privacidade</b><p class="tiny">Nenhuma conta, servidor, anúncio ou serviço Google é necessário. Seu histórico fica no armazenamento local do navegador.</p>
+<div class="row"><button class="primary" id="export">Exportar backup .txt</button><button class="secondary" id="importBtn">Restaurar backup</button><input type="file" id="importFile" accept=".txt,.json" hidden></div>
+<p class="tiny" id="dataMsg"></p></div>
+<div class="panel"><b>Como jogar</b><p class="tiny">Em cada tentativa, observe os estímulos. Pressione o botão de uma modalidade quando o estímulo atual for igual ao apresentado N tentativas atrás. Se não houver correspondência, não pressione.</p>
+<p class="tiny"><b>Dual:</b> posição + som/letra. <b>Triple:</b> adiciona cor. <b>Quad:</b> adiciona forma. O som é sintetizado no próprio aparelho; não depende de internet.</p>
+<p class="tiny">A rodada avalia acertos, omissões e falsos alarmes por modalidade. Velocidade é calculada pelo tempo total da rodada. O recorde é o maior N-back concluído com pelo menos 70% de precisão geral.</p></div>
+</section>
+<footer>N-Back Offline · dados salvos neste dispositivo</footer>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), keys=['Posição','Som','Cor','Forma'], icons=['▦','♫','●','◆'];
+const colors=['#ff687a','#ffd166','#62e5df','#9d8cff','#ff9b55','#75d99a'];
+const shapes=['◆','●','▲','✚','⬟','✦']; let db=load(), game=null, timer=null, paused=false, audioCtx=null;
+function load(){try{return JSON.parse(localStorage.getItem('nback_offline_v1'))||{history:[],best:0}}catch(e){return {history:[],best:0}}}
+function save(){localStorage.setItem('nback_offline_v1',JSON.stringify(db));refresh()}
+for(let n=1;n<=9;n++) $('level').add(new Option(n+'-Back',n));
+function refresh(){
+$('best').textContent=db.best?db.best+'-Back':'Ainda sem recorde';
+$('totalRounds').textContent=db.history.length;
+$('avgAcc').textContent=db.history.length?Math.round(db.history.reduce((a,x)=>a+x.accuracy,0)/db.history.length)+'%':'—';
+$('topLevel').textContent=db.best?db.best+'-Back':'—';
+$('history').innerHTML=db.history.length?db.history.slice(-12).reverse().map(x=>`<div class="historyitem"><div><b>${x.mode} · ${x.n}-Back</b><div class="tiny">${new Date(x.date).toLocaleString('pt-BR')} · ${x.trials} tentativas</div></div><div style="text-align:right"><b>${x.accuracy}%</b><div class="tiny">${x.correct}/${x.possible} acertos</div></div></div>`).join(''):'Nenhuma rodada concluída ainda.';
+}
+function rand(n){return Math.floor(Math.random()*n)}
+function sound(letter){try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=220+letter*38;g.gain.setValueAtTime(.0001,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.14,audioCtx.currentTime+.025);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+.32);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.34)}catch(e){}}
+function newTrial(){let t={pos:rand(9),letter:rand(8),color:rand(colors.length),shape:rand(shapes.length),pressed:[false,false,false,false],targets:[false,false,false,false],start:performance.now()};let i=game.seq.length;
+if(i>=game.n){let prev=game.seq[i-game.n];t.targets=[t.pos===prev.pos,t.letter===prev.letter,t.color===prev.color,t.shape===prev.shape]}
+game.seq.push(t);return t}
+function start(){
+let n=+$('level').value,mode=+$('mode').value,total=+$('length').value;
+game={n,mode,total,seq:[],index:0,stats:Array.from({length:mode},()=>({hit:0,miss:0,false:0,rt:[]})),roundStart:performance.now(),pausedAt:0,pausedTotal:0};
+$('setup').style.display='none';$('result').style.display='none';$('game').style.display='block';$('gameTitle').textContent=['','', 'Dual','Triple','Quad'][mode]+' N-Back';$('roundMeta').textContent=n+'-Back · '+total+' tentativas';$('matchgrid').innerHTML='';
+for(let k=0;k<mode;k++){let b=document.createElement('button');b.className='matchbtn';b.innerHTML=icons[k]+' '+keys[k]+'<em>Correspondência</em>';b.onclick=()=>press(k,b);$('matchgrid').append(b)}
+next();
+}
+function draw(t){
+let html='';for(let k=0;k<game.mode;k++){
+let body='';
+if(k===0){body='<div class="grid9">'+Array.from({length:9},(_,i)=>`<i class="cell ${i===t.pos?'on':''}"></i>`).join('')+'</div>'}
+if(k===1)body=`<div class="symbol">${'ABCDEFGH'[t.letter]}</div><div class="tiny">som</div>`;
+if(k===2)body=`<div class="symbol" style="color:${colors[t.color]};font-size:58px">●</div>`;
+if(k===3)body=`<div class="symbol" style="font-size:58px">${shapes[t.shape]}</div>`;
+html+=`<div class="stim"><div class="hint">${keys[k]}</div>${body}</div>`;
+}$('stage').innerHTML=html;
+}
+function next(){
+if(game.index>=game.total){finish();return}
+let t=newTrial();draw(t);$('counter').textContent=(game.index+1)+' / '+game.total;$('progressbar').style.width=(game.index/game.total*100)+'%';
+$('feedback').textContent=game.index<game.n?'Aquecimento: memorize os estímulos.': 'Marque cada modalidade que se repetiu '+game.n+' tentativa(s) atrás.';
+if(game.mode>=2)sound(t.letter);
+game.index++;timer=setTimeout(evaluate,2100);
+}
+function press(k,b){if(!game||paused)return;let t=game.seq[game.seq.length-1];if(!t||t.pressed[k])return;t.pressed[k]=true;b.classList.add('hit')}
+function evaluate(){
+let i=game.seq.length-1,t=game.seq[i];if(i>=game.n){for(let k=0;k<game.mode;k++){let s=game.stats[k];if(t.targets[k]&&t.pressed[k])s.hit++;else if(t.targets[k]&&!t.pressed[k])s.miss++;else if(!t.targets[k]&&t.pressed[k])s.false++}} 
+$('matchgrid').querySelectorAll('button').forEach(b=>b.classList.remove('hit'));
+next();
+}
+function finish(){
+clearTimeout(timer);let possible=game.stats.reduce((a,s)=>a+s.hit+s.miss,0),hits=game.stats.reduce((a,s)=>a+s.hit,0),falseN=game.stats.reduce((a,s)=>a+s.false,0),accuracy=possible?Math.round(hits/possible*100):0,elapsed=Math.round((performance.now()-game.roundStart)/1000),trialScored=game.total-game.n;
+let x={date:new Date().toISOString(),n:game.n,mode:['','','Dual','Triple','Quad'][game.mode],trials:game.total,correct:hits,possible,accuracy,falseAlarms:falseN,seconds:elapsed,speed:Math.round(game.total/Math.max(1,elapsed)*60)};
+db.history.push(x);if(accuracy>=70&&game.n>db.best)db.best=game.n;save();
+$('game').style.display='none';$('result').style.display='block';
+$('result').innerHTML=`<div class="row between"><b>Rodada concluída!</b><span class="pill">${x.mode} · ${x.n}-Back</span></div><div class="stats" style="margin:14px 0"><div class="stat"><b>${accuracy}%</b><span>PRECISÃO</span></div><div class="stat"><b>${elapsed}s</b><span>DURAÇÃO</span></div><div class="stat"><b>${x.speed}</b><span>TENT./MIN</span></div></div><p class="tiny">Acertos: ${hits} de ${possible} alvos · falsos alarmes: ${falseN}</p>${game.stats.map((s,k)=>`<div style="margin:10px 0"><div class="row between tiny"><b>${keys[k]}</b><span>${s.hit} acertos · ${s.miss} omissões · ${s.false} falsos</span></div><div class="bar"><i style="width:${(s.hit+s.miss)?s.hit/(s.hit+s.miss)*100:0}%"></i></div></div>`).join('')}<div class="row" style="margin-top:16px"><button class="primary" id="again">Nova rodada</button><button class="secondary" id="toProgress">Ver progresso</button></div>`;
+$('again').onclick=()=>{$('result').style.display='none';$('setup').style.display='block'};$('toProgress').onclick=()=>tab('progress');
+game=null;
+}
+function tab(name){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));['train','progress','settings'].forEach(x=>$(x).classList.toggle('hidden',x!==name));}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+$('start').onclick=start;
+$('quit').onclick=()=>{if(confirm('Encerrar esta rodada sem salvar o resultado?')){clearTimeout(timer);game=null;$('game').style.display='none';$('setup').style.display='block'}};
+$('pause').onclick=()=>{if(!game)return;if(!paused){clearTimeout(timer);paused=true;$('pause').textContent='Continuar';$('feedback').textContent='Pausado';$('stage').style.opacity='.25'}else{paused=false;$('pause').textContent='Pausar';$('stage').style.opacity='1';$('feedback').textContent='Continue observando os estímulos.';timer=setTimeout(evaluate,1200)}};
+$('export').onclick=()=>{
+if(window.AndroidBridge){window.AndroidBridge.exportBackup(JSON.stringify(db));$('dataMsg').textContent='Escolha onde salvar o backup.';return}
+let blob=new Blob([JSON.stringify(db,null,2)],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-nback.txt';a.click();URL.revokeObjectURL(a.href);$('dataMsg').textContent='Backup exportado.'};
+$('importBtn').onclick=()=>{if(window.AndroidBridge){window.AndroidBridge.importBackup();return}$('importFile').click()};
+$('importFile').onchange=async e=>{try{let d=JSON.parse(await e.target.files[0].text());if(!Array.isArray(d.history)||typeof d.best!=='number')throw 0;db=d;save();$('dataMsg').textContent='Backup restaurado com sucesso.'}catch(err){$('dataMsg').textContent='Arquivo inválido. Selecione um backup .txt criado por este app.'}};
+window.importBackupFromNative=(content)=>{try{let d=JSON.parse(content);if(!Array.isArray(d.history)||typeof d.best!=='number')throw 0;db=d;save();$('dataMsg').textContent='Backup restaurado com sucesso.'}catch(err){$('dataMsg').textContent='Arquivo inválido. Selecione um backup .txt criado por este app.'}};
+refresh();
+})();
+</script></body></html>

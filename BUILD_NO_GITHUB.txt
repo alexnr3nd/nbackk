@@ -1,0 +1,8 @@
+BUILD PELO GITHUB
+1. Envie o conteúdo desta pasta para a raiz de um repositório GitHub.
+2. Abra Actions.
+3. Execute Build Android APK (ou aguarde após push).
+4. Baixe o artifact NBackOffline-debug-apk.
+5. Extraia e instale app-debug.apk no Android.
+
+O APK é debug. O jogo funciona offline depois de instalado.
